@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:tres_astronautas_test/src/models/gif_model.dart';
 
@@ -34,7 +36,7 @@ class RestaurantFavoriteController {
     }
   ];
 
-  Future<GifModel> giftSearch({String? search}) async {
+  Future giftSearch({String? search, BuildContext? context}) async {
     Map<String, String> queryParams = {
       'api_key': apiKey,
       'q': search ?? 'restaurant',
@@ -50,10 +52,36 @@ class RestaurantFavoriteController {
     // };
     String queryString = Uri(queryParameters: queryParams).query;
     var requestUrl = '$endPoint/$version/gifs/search?' + queryString;
-
-    final response = await http.get(Uri.parse(requestUrl));
-    var data = json.decode(response.body);
-    var gif = GifModel.fromJson(data);
-    return gif;
+    try {
+      final response = await http.get(Uri.parse(requestUrl));
+      if (response.statusCode == 200) {
+        var data = json.decode(response.body);
+        var gif = GifModel.fromJson(data);
+        ScaffoldMessenger.of(context!).showSnackBar(const SnackBar(
+            backgroundColor: Colors.white24,
+            content: Text(
+              'Recibiendo datos',
+              style:
+                  TextStyle(color: Colors.black54, fontWeight: FontWeight.bold),
+            )));
+        return gif;
+      } else {
+        ScaffoldMessenger.of(context!).showSnackBar(SnackBar(
+            backgroundColor: Colors.white24,
+            content: Text(
+              'Error :${response.body} ',
+              style: const TextStyle(
+                  color: Colors.black54, fontWeight: FontWeight.bold),
+            )));
+      }
+    } on SocketException {
+      ScaffoldMessenger.of(context!).showSnackBar(const SnackBar(
+          backgroundColor: Colors.white24,
+          content: Text(
+            'No hay conexion a internet',
+            style:
+                TextStyle(color: Colors.black54, fontWeight: FontWeight.bold),
+          )));
+    }
   }
 }

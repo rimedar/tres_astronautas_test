@@ -160,12 +160,12 @@ class _RestaurantFavoritePageState extends State<RestaurantFavoritePage>
                   )
                 ],
               ),
-              FutureBuilder<GifModel>(
-                  future:
-                      resFavoriteController.giftSearch(search: toSearchPage),
+              FutureBuilder(
+                  future: resFavoriteController.giftSearch(
+                      search: toSearchPage, context: context),
                   builder: (
                     BuildContext context,
-                    AsyncSnapshot<GifModel> snapshot,
+                    AsyncSnapshot snapshot,
                   ) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(
@@ -207,6 +207,29 @@ class _RestaurantFavoritePageState extends State<RestaurantFavoritePage>
                                               width: responsive.wp(40),
                                               height: responsive.wp(30),
                                               fit: BoxFit.cover,
+                                              errorBuilder: (context, exception,
+                                                      stackTrack) =>
+                                                  Column(
+                                                children: [
+                                                  SizedBox(
+                                                    width: responsive.wp(40),
+                                                    child: Text(
+                                                      'No se pudo cargar la imagen',
+                                                      style: TextStyle(
+                                                          fontSize: responsive
+                                                              .dp(1.6),
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      maxLines: 2,
+                                                    ),
+                                                  ),
+                                                  const Icon(
+                                                    Icons.error,
+                                                  ),
+                                                ],
+                                              ),
                                               loadingBuilder:
                                                   (BuildContext context,
                                                       Widget child,
